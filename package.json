@@ -1,0 +1,20 @@
+{
+  "name": "pn532",
+  "version": "0.0.1",
+  "description": "Library to run the PN532 RFID Reader",
+  "main": "src/bootstrap.js",
+  "devDependencies": {
+    "traceur": "0.0.65"
+  },
+  "dependencies": {
+    "bluebird": "^2.3.2",
+    "winston": "^0.8.0"
+  },
+  "optionalDependencies": {
+    "serialport": "1.4.6",
+    "i2c": "^0.1.4"
+  },
+  "repository": "",
+  "author": "Sean Lynch <techniq35@gmail.com>",
+  "license": "MIT"
+}
