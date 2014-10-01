@@ -3,30 +3,19 @@ var SerialPort = require('serialport').SerialPort
 var Promise = require('bluebird');
 var EventEmitter = require('events').EventEmitter;
 
-import { setupLogging } from './logs';
-setupLogging(process.env.NODE_ENV === 'debug' ? 'debug' : 'warn');
+var setupLogging = require('./logs');
+setupLogging(process.env.NODE_ENV === 'debug' ? 'debug' : 'info');
+var logger = require('winston').loggers.get('hsu');
 
-var winston = require('winston');
-var logger = winston.loggers.get('hsu');
+var FrameEmitter = require('./frame_emitter').FrameEmitter;
+var DataFrame = require('./frame').DataFrame;
+var c = require('./constants');
 
 // var i2c = require('i2c');
 // var Gpio = require('onoff').Gpio;
 
-import { DataFrame } from './frame';
-import { FrameEmitter } from './frame_emitter';
-import {
-    COMMAND_GET_FIRMWARE_VERSION,
-    COMMAND_GET_GENERAL_STATUS,
-    COMMAND_INLISTPASSIVETARGET,
-    COMMAND_SAMCONFIGURATION,
-    SAMCONFIGURATION_MODE_NORMAL,
-    SAMCONFIGURATION_IRQ_ON,
-    DIRECTION_HOST_TO_PN532,
-    CARD_ISO14443A
-} from './constants';
 
-
-export class PN532_HSU extends EventEmitter {
+class PN532_HSU extends EventEmitter {
     constructor(port, options) {
         options = options || {};
         this.port = port || '/dev/ttyO1';
@@ -118,24 +107,22 @@ export class PN532_HSU extends EventEmitter {
     }
 
     samConfig() {
-        logger.debug(new Array(80).join('-'));
-        logger.debug('Configuring secure access module (SAM)...');
+        logger.info('Configuring secure access module (SAM)...');
 
         // TODO: Test IRQ triggered reads
         var commandBuffer = [
-            COMMAND_SAMCONFIGURATION,
-            SAMCONFIGURATION_MODE_NORMAL,
+            c.COMMAND_SAMCONFIGURATION,
+            c.SAMCONFIGURATION_MODE_NORMAL,
             0x00,                   // Timeout
-            SAMCONFIGURATION_IRQ_ON // Use IRQ pin
+            c.SAMCONFIGURATION_IRQ_ON // Use IRQ pin
         ];
         return this.writeCommand(commandBuffer);
     }
 
     getFirmwareVersion() {
-        logger.debug(new Array(80).join('-'));
-        logger.debug('Getting firmware version...');
+        logger.info('Getting firmware version...');
 
-        return this.writeCommand([COMMAND_GET_FIRMWARE_VERSION])
+        return this.writeCommand([c.COMMAND_GET_FIRMWARE_VERSION])
             .then((frame) => {
                 var body = frame.getDataBody();
                 return {
@@ -148,10 +135,9 @@ export class PN532_HSU extends EventEmitter {
     }
 
     getGeneralStatus() {
-        logger.debug(new Array(80).join('-'));
-        logger.debug('Getting general status...');
+        logger.info('Getting general status...');
 
-        return this.writeCommand([COMMAND_GET_GENERAL_STATUS])
+        return this.writeCommand([c.COMMAND_GET_GENERAL_STATUS])
             .then((frame) => {
                 var body = frame.getDataBody();
                 return body;
@@ -159,13 +145,12 @@ export class PN532_HSU extends EventEmitter {
     }
 
     readPassiveTargetId() {
-        logger.debug(new Array(80).join('-'));
-        logger.debug('Reading passive target id...');
+        logger.info('Reading passive target id...');
 
         var commandBuffer = [
-            COMMAND_INLISTPASSIVETARGET,
+            c.COMMAND_INLISTPASSIVETARGET,
             0x01,
-            CARD_ISO14443A
+            c.CARD_ISO14443A
         ];
 
         return this.writeCommand(commandBuffer)
@@ -186,3 +171,5 @@ export class PN532_HSU extends EventEmitter {
             });
     }
 }
+
+module.exports = PN532_HSU;

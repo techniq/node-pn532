@@ -1,6 +1,4 @@
-import {
-    DIRECTION_HOST_TO_PN532
-} from './constants';
+var c = require('./constants');
 
 var PREAMBLE     = 0x00;
 var START_CODE_1 = 0x00;
@@ -10,7 +8,7 @@ var POSTAMBLE    = 0x00;
 /*
     Represents a single communication frame for communication with the PN532 NFC Chip.
 */
-export class Frame {
+class Frame {
     // Gets the frame's data length
     getFrameLength() {
         throw new Error('Implement in subclass');
@@ -49,7 +47,7 @@ export class Frame {
     }
 }
 
-export class DataFrame extends Frame {
+class DataFrame extends Frame {
     /*
         Constructor
 
@@ -70,7 +68,7 @@ export class DataFrame extends Frame {
             this.direction = buffer[5];
         } else if (data instanceof Array) {
             this._data = data;
-            this._direction = direction || DIRECTION_HOST_TO_PN532;
+            this._direction = direction || c.DIRECTION_HOST_TO_PN532;
         } else {
             throw new Error('data must be an instanceof a Buffer or Array');
         }
@@ -161,7 +159,7 @@ export class DataFrame extends Frame {
     }
 }
 
-export class AckFrame extends Frame {
+class AckFrame extends Frame {
     constructor() {
         super();
     }
@@ -193,7 +191,7 @@ export class AckFrame extends Frame {
     }
 }
 
-export class NackFrame extends Frame {
+class NackFrame extends Frame {
     constructor() {
         super();
     }
@@ -226,7 +224,7 @@ export class NackFrame extends Frame {
     }
 }
 
-export class ErrorFrame extends DataFrame {
+class ErrorFrame extends DataFrame {
     constructor() {
         super([0x7F]);
     }
@@ -257,3 +255,9 @@ export class ErrorFrame extends DataFrame {
         ]);
     }
 }
+
+exports.Frame = Frame;
+exports.DataFrame = DataFrame;
+exports.AckFrame = AckFrame;
+exports.NackFrame = NackFrame;
+exports.ErrorFrame = ErrorFrame;

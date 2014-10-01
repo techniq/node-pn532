@@ -1,6 +1,6 @@
 var winston = require('winston');
 
-export function setupLogging(level='info') {
+module.exports = function setupLogging(level='info') {
     // winston.loggers.options.transports = [
     //     new winston.transports.Console({
     //         level: 'debug',

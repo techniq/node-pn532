@@ -1,10 +1,4 @@
-var traceur = require('traceur');
-traceur.require.makeDefault(function(filename) {
-  // don't transpile our dependencies, just our app
-  return filename.indexOf('node_modules') === -1;
-});
-
-var PN532_HSU = require('./pn532_hsu').PN532_HSU;
+var PN532_HSU = require('./pn532_hsu');
 var pn532 = new PN532_HSU('/dev/tty.usbserial-AFWR836M', { baudrate: 115200 });
 
 pn532.on('ready', function() {

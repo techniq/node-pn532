@@ -2,9 +2,12 @@ var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 var logger = require('winston').loggers.get('frame-emitter');
 
-import { Frame, DataFrame, ErrorFrame } from './frame';
+var frame = require('./frame');
+var Frame = frame.Frame;
+var DataFrame = frame.DataFrame;
+var ErrorFrame = frame.ErrorFrame;
 
-export class FrameEmitter extends EventEmitter {
+class FrameEmitter extends EventEmitter {
     constructor(serial) {
         this.serial = serial;
         this.buffer = new Buffer(0);
@@ -32,7 +35,7 @@ export class FrameEmitter extends EventEmitter {
             this.emit('frame', frame);
 
             if (frame instanceof ErrorFrame) {
-                logger.debug('ErrorFrame found in buffer', util.inspect(frame));
+                logger.error('ErrorFrame found in buffer', util.inspect(frame));
                 this.emit('error', frame);
             } else if (frame instanceof DataFrame) {
                 logger.debug('DataFrame found in buffer', util.inspect(frame));
@@ -48,5 +51,6 @@ export class FrameEmitter extends EventEmitter {
             }
         }
     }
-
 }
+
+exports.FrameEmitter = FrameEmitter;

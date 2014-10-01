@@ -4,7 +4,8 @@
   "description": "Library to run the PN532 RFID Reader",
   "main": "src/bootstrap.js",
   "devDependencies": {
-    "traceur": "0.0.65"
+    "gulp": "^3.8.8",
+    "gulp-esnext": "^1.1.1"
   },
   "dependencies": {
     "bluebird": "^2.3.2",
