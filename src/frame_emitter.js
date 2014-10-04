@@ -8,17 +8,24 @@ var DataFrame = frame.DataFrame;
 var ErrorFrame = frame.ErrorFrame;
 
 class FrameEmitter extends EventEmitter {
-    constructor(serial) {
-        this.serial = serial;
+    /*
+        @constructor
+        @param {object} hal - An instance of PN532_UART or PN532_I2C
+    */
+    constructor(hal) {
+        this.hal = hal;
         this.buffer = new Buffer(0);
 
-        this.serial.on('data', (data) => {
+        logger.debug('listening to data');
+
+        // console.dir(hal);
+        this.hal.on('data', (data) => {
             logger.debug('Data received', util.inspect(data));
             this.buffer = Buffer.concat([this.buffer, data]);
             this._processBuffer();
         });
 
-        this.serial.on('error', (error) => {
+        this.hal.on('error', (error) => {
             this.emit('error', error);
         });
     }

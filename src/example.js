@@ -1,26 +1,29 @@
-var PN532_HSU = require('./pn532_hsu');
-var pn532 = new PN532_HSU('/dev/tty.usbserial-AFWR836M', { baudrate: 115200 });
+var pn532 = require('./pn532');
 
-pn532.on('ready', function() {
-    // setInterval(function() {
+var SerialPort = require('serialport').SerialPort;
+var serialPort = new SerialPort('/dev/tty.usbserial-AFWR836M', { baudrate: 115200 });
+var rfid = new pn532.PN532(serialPort);
 
-        // pn532.getFirmwareVersion().then(function(data) {
-        //     console.log('firmware: ', data);
-        // });
+rfid.on('ready', function() {
+    // rfid.getFirmwareVersion().then(function(data) {
+    //     console.log('firmware: ', data);
+    // });
 
-        // pn532.getGeneralStatus().then(function(data) {
-        //     console.log('status: ', data);
-        // });
+    // pn532.getGeneralStatus().then(function(data) {
+    //     console.log('status: ', data);
+    // });
 
-        pn532.readPassiveTargetId()
-            .then(function(card) {
-                if (card)
-                    console.log('card: ', card);
-            })
-            .catch(function(error) {
-                console.log('ERROR:', error);
-            });
-    // }, 1000)
+    // pn532.readPassiveTargetId()
+    //     .then(function(card) {
+    //         if (card)
+    //             console.log('card: ', card);
+    //     })
+    //     .catch(function(error) {
+    //         console.log('ERROR:', error);
+    //     });
 
-    // pn532.on('cardRead', function(card) { ... });
+    console.log('Listening for a card scan...');
+    rfid.on('card', function(data) {
+        console.log(Date.now(), 'UID:', data.uid);
+    });
 });

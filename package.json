@@ -2,8 +2,9 @@
   "name": "pn532",
   "version": "0.0.1",
   "description": "Library to run the PN532 RFID Reader",
-  "main": "src/bootstrap.js",
+  "main": "dist/pn532.js",
   "devDependencies": {
+    "del": "^0.1.3",
     "gulp": "^3.8.8",
     "gulp-esnext": "^1.1.1"
   },

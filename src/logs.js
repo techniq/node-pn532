@@ -1,6 +1,6 @@
 var winston = require('winston');
 
-module.exports = function setupLogging(level='info') {
+module.exports = function setupLogging(level='warn') {
     // winston.loggers.options.transports = [
     //     new winston.transports.Console({
     //         level: 'debug',
@@ -34,6 +34,14 @@ module.exports = function setupLogging(level='info') {
     });
 
     winston.loggers.add('hsu', {
+        console: {
+          level: level,
+          colorize: 'true',
+          label: 'hsu'
+        }
+    });
+
+    winston.loggers.add('i2c', {
         console: {
           level: level,
           colorize: 'true',
