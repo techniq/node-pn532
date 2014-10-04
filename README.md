@@ -1,6 +1,15 @@
 # PN532
 
-Provides a promise-based API for the PN532 NFC chip.
+Driver for the PN532 NFC chip.  Provides a promise-based API, and requires either:
+- [node-serialport](https://github.com/voodootikigod/node-serialport) for UART
+- [node-i2c](https://github.com/kelly/node-i2c)
+
+This implementation does not require libnfc, and should work on both X86 (32-bit or 64-bit) and ARM (RPi / Beaglebone) systems
+
+Testing on a Mac OSX 10.9 system using UART/FTDI cable to an [Adafruit breakout board](https://www.adafruit.com/products/364)
+and on a BeagleBone using UART.  I2C support is currently untested at the moment.
+
+API is subject to change until the 1.0.0 release
 
 ### Links
 - [Datasheet](http://www.nxp.com/documents/short_data_sheet/PN532_C1_SDS.pdf)
@@ -34,7 +43,7 @@ rfid.on('ready', function() {
 });
 ```
 
-#### Getting the firmware version
+#### Getting the firmware version (using Promises)
 ```js
 rfid.on('ready', function() {
     rfid.getFirmwareVersion().then(function(data) {
