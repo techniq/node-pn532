@@ -19,7 +19,7 @@ API is subject to change until the 1.0.0 release
 
 #### UART (using [node-serialport](https://github.com/voodootikigod/node-serialport))
 ```js
-var pn532 = require('./pn532');
+var pn532 = require('pn532');
 var SerialPort = require('serialport').SerialPort;
 
 var serialPort = new SerialPort('/dev/tty.usbserial-AFWR836M', { baudrate: 115200 });
@@ -28,7 +28,7 @@ var rfid = new pn532.PN532(serialPort);
 
 #### I2C (using [node-i2c](https://github.com/kelly/node-i2c))
 ```js
-var pn532 = require('./pn532');
+var pn532 = require('pn532');
 var i2c = require('i2c');
 
 var wire = new i2c(pn532.I2C_ADDRESS, {device: '/dev/i2c-1'});
