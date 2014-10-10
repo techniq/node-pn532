@@ -20,8 +20,8 @@ class PN532 extends EventEmitter {
         this.pollInterval = options.pollInternal || 1000;
 
         if (hal.constructor.name === 'SerialPort') {
-            var PN532_HSU = require('./pn532_hsu');
-            this.hal = new PN532_HSU(hal);
+            var PN532_UART = require('./pn532_uart');
+            this.hal = new PN532_UART(hal);
         } else if (hal.constructor.name === 'i2c') {
             var PN532_I2C = require('./pn532_i2c');
             this.hal = new PN532_I2C(hal);
@@ -61,7 +61,7 @@ class PN532 extends EventEmitter {
             // Wire up listening to wait for response (or error) from PN532
             var onFrame = (frame) => {
                 logger.debug('response received for writeCommand', util.inspect(frame));
-                // TODO: If no ACK after 15ms, resend? (page 40 of user guide, HSU only)?
+                // TODO: If no ACK after 15ms, resend? (page 40 of user guide, UART only)?
 
                 if (frame instanceof DataFrame) {
                     logger.debug('isResponse', util.inspect(frame));

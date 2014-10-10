@@ -1,19 +1,19 @@
 var Promise = require('bluebird');
 var EventEmitter = require('events').EventEmitter;
+var logger = require('winston').loggers.get('uart');
 
-var logger = require('winston').loggers.get('hsu');
-
-class PN532_HSU extends EventEmitter {
+class PN532_UART extends EventEmitter {
     constructor(serialPort) {
         this.serial = serialPort;
+        this.isAwake = false;
     }
 
     init() {
-        logger.debug('Initing HSU...');
+        logger.debug('Initializing serial port...');
         return new Promise((resolve, reject) => {
             this.serial.on('open', (error) => {
                 if (error) {
-                    logger.error('Error on opening HSU', error);
+                    logger.error('Error opening serial port', error);
                     reject();
                 }
 
@@ -21,27 +21,25 @@ class PN532_HSU extends EventEmitter {
                     this.emit('data', data);
                 });
 
-                return this.wakeup().then(resolve);
+                logger.debug('Serial port initialized.');
+                resolve();
             });
             this.serial.on('error', (error) => {
-                logger.error('An error occurred on HSU', error);
+                logger.error('An error occurred on serial port', error);
                 reject();
             });
         });
     }
 
-    wakeup() {
-        logger.debug('Waking up PN532...');
-
-        return new Promise((resolve, reject) => {
-            this.serial.write(new Buffer([0x55, 0x55, 0x00, 0x00, 0x00]));
-            resolve();
-        });
-    }
-
     write(buffer) {
+        if (!this.isAwake) {
+            logger.debug('Waking up PN532...');
+            this.serial.write(new Buffer([0x55, 0x55, 0x00, 0x00, 0x00]));
+            this.isAwake = true;
+        }
+
         this.serial.write(buffer);
     }
 }
 
-module.exports = PN532_HSU;
+module.exports = PN532_UART;

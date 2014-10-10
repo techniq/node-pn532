@@ -33,7 +33,7 @@ module.exports = function setupLogging(level='warn') {
         }
     });
 
-    winston.loggers.add('hsu', {
+    winston.loggers.add('uart', {
         console: {
           level: level,
           colorize: 'true',

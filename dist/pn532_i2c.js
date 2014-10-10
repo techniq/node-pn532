@@ -20,7 +20,7 @@ var PN532_I2C = function($__super) {
 
     $__Object$defineProperty(PN532_I2C.prototype, "init", {
         value: function() {
-            logger.debug('Initing i2c...');
+            logger.debug('Initializing I2C...');
             return new Promise(function(resolve, reject) {
                 this.wire.on('data', function(data) {
                     this.emit('data', data);
@@ -30,22 +30,8 @@ var PN532_I2C = function($__super) {
                     this.emit('error', error);
                 }.bind(this));
 
-                return this.wakeup().then(resolve);
-            }.bind(this));
-        },
-
-        enumerable: false,
-        writable: true
-    });
-
-    $__Object$defineProperty(PN532_I2C.prototype, "wakeup", {
-        value: function() {
-            logger.debug('Waking up PN532...');
-
-            return new Promise(function(resolve, reject) {
-                // TODO: Need to do anything else with I2C.  Send an empty frame?
                 resolve();
-            });
+            }.bind(this));
         },
 
         enumerable: false,

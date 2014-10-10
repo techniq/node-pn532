@@ -1,6 +1,5 @@
 var Promise = require('bluebird');
 var EventEmitter = require('events').EventEmitter;
-
 var logger = require('winston').loggers.get('i2c');
 
 class PN532_I2C extends EventEmitter {
@@ -9,7 +8,7 @@ class PN532_I2C extends EventEmitter {
     }
 
     init() {
-        logger.debug('Initing i2c...');
+        logger.debug('Initializing I2C...');
         return new Promise((resolve, reject) => {
             this.wire.on('data', (data) => {
                 this.emit('data', data);
@@ -19,15 +18,6 @@ class PN532_I2C extends EventEmitter {
                 this.emit('error', error);
             });
 
-            return this.wakeup().then(resolve);
-        });
-    }
-
-    wakeup() {
-        logger.debug('Waking up PN532...');
-
-        return new Promise((resolve, reject) => {
-            // TODO: Need to do anything else with I2C.  Send an empty frame?
             resolve();
         });
     }
