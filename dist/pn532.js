@@ -175,10 +175,15 @@ var PN532 = function($__super) {
                         var tagNumber = body[1];
                         var uidLength = body[5];
 
+                        var uid = body.slice(6, 6 + uidLength)
+                                      .toString('hex')
+                                      .match(/.{1,2}/g)
+                                      .join(':');
+
                         return {
                             SENS_RES: body.slice(2, 4),
                             SEL_RES: body[4],
-                            uid: body.slice(6, 6 + uidLength)
+                            uid: uid
                         };
                     }
                 });
