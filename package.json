@@ -1,6 +1,6 @@
 {
   "name": "pn532",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Library to run the PN532 RFID Reader",
   "main": "dist/pn532.js",
   "scripts": {
