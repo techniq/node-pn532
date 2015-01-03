@@ -148,7 +148,7 @@ var PN532 = (function () {
   PN532.prototype.readPassiveTargetId = function () {
     logger.info("Reading passive target id...");
 
-    var commandBuffer = [c.COMMAND_INLISTPASSIVETARGET, 1, c.CARD_ISO14443A];
+    var commandBuffer = [c.COMMAND_IN_LIST_PASSIVE_TARGET, 1, c.CARD_ISO14443A];
 
     return this.writeCommand(commandBuffer).then(function (frame) {
       var body = frame.getDataBody();

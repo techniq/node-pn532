@@ -131,7 +131,7 @@ class PN532 extends EventEmitter {
         logger.info('Reading passive target id...');
 
         var commandBuffer = [
-            c.COMMAND_INLISTPASSIVETARGET,
+            c.COMMAND_IN_LIST_PASSIVE_TARGET,
             0x01,
             c.CARD_ISO14443A
         ];

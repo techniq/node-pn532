@@ -10,22 +10,46 @@ exports.I2C_ADDRESS = 0x48 >> 1; // 7-bit address bit shifted to 8-bit (?)
 // exports.I2C_READYTIMEOUT = 20;
 
 // Section 7 - Commands supported (page 65)
-exports.COMMAND_GET_FIRMWARE_VERSION = 0x02;
-exports.COMMAND_GET_GENERAL_STATUS   = 0x04;
-exports.COMMAND_READ_REGISTER        = 0x06;
-exports.COMMAND_WRITE_REGISTER       = 0x08;
-exports.COMMAND_READ_GPIO            = 0x0C;
-exports.COMMAND_WRITE_GPIO           = 0x0E;
-exports.COMMAND_SAMCONFIGURATION     = 0x14;
-exports.COMMAND_POWER_DOWN           = 0x16;
-exports.COMMAND_INLISTPASSIVETARGET  = 0x4A;
-exports.COMMAND_RFCONFIGURATION      = 0x32;
-exports.COMMAND_INDATAEXCHANGE       = 0x40;
-exports.COMMAND_INDESELECT           = 0x44;
+// Miscellaneous
+exports.COMMAND_DIAGNOSE               = 0x00;
+exports.COMMAND_GET_FIRMWARE_VERSION   = 0x02;
+exports.COMMAND_GET_GENERAL_STATUS     = 0x04;
+exports.COMMAND_READ_REGISTER          = 0x06;
+exports.COMMAND_WRITE_REGISTER         = 0x08;
+exports.COMMAND_READ_GPIO              = 0x0C;
+exports.COMMAND_WRITE_GPIO             = 0x0E;
+exports.COMMAND_SET_SERIAL_BAUD_RATE   = 0x10;
+exports.COMMAND_SET_PARAMETERS         = 0x12;
+exports.COMMAND_SAMCONFIGURATION       = 0x14;
+exports.COMMAND_POWER_DOWN             = 0x16;
+// RF Communicaions
+exports.COMMAND_RF_CONFIGUATION        = 0x32;
+exports.COMMAND_RF_REGULATION_TEST     = 0x58;
+// Initiator
+exports.COMMAND_IN_JUMP_FOR_DEP        = 0x56;
+exports.COMMAND_IN_JUMP_FOR_PSL        = 0x46;
+exports.COMMAND_IN_LIST_PASSIVE_TARGET = 0x4A;
+exports.COMMAND_IN_ATR                 = 0x50;
+exports.COMMAND_IN_PSL                 = 0x4E;
+exports.COMMAND_IN_DATA_EXCHANGE       = 0x40;
+exports.COMMAND_IN_COMMUNICATE_THRU    = 0x42;
+exports.COMMAND_IN_DESELECT            = 0x44;
+exports.COMMAND_IN_RELEASE             = 0x52;
+exports.COMMAND_IN_SELECT              = 0x54;
+exports.COMMAND_IN_AUTO_POLL           = 0x60;
+// Target
+exports.TG_INIT_AS_TARGET              = 0x8C;
+exports.TG_SET_GENERAL_BYTES           = 0x92;
+exports.TG_GET_DATA                    = 0x86;
+exports.TG_SET_DATA                    = 0x8E;
+exports.TG_SET_META_DATA               = 0x94;
+exports.TG_GET_INITIATOR_COMMAND       = 0x88;
+exports.TG_RESPONSE_TO_INITIATOR       = 0x90;
+exports.TG_GET_TARGET_STATUS           = 0x8A;
 
 // Frame Identifiers (TFI)
-exports.DIRECTION_HOST_TO_PN532 = 0xD4;
-exports.DIRECTION_TO_HOST       = 0xD5;
+exports.DIRECTION_HOST_TO_PN532        = 0xD4;
+exports.DIRECTION_PN532_TO_HOST        = 0xD5;
 
 // Values for PN532's SAMCONFIGURATION function.
 exports.SAMCONFIGURATION_MODE_NORMAL       = 0x01;
