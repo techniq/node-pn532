@@ -1,53 +1,50 @@
-var $__Object$defineProperty = Object.defineProperty;
-var $__Object$create = Object.create;
-var Promise = require('bluebird');
-var EventEmitter = require('events').EventEmitter;
-var logger = require('winston').loggers.get('i2c');
+"use strict";
 
-var PN532_I2C = function($__super) {
-    "use strict";
-
-    function PN532_I2C(wire) {
-        this.wire = wire;
+var _inherits = function (child, parent) {
+  child.prototype = Object.create(parent && parent.prototype, {
+    constructor: {
+      value: child,
+      enumerable: false,
+      writable: true,
+      configurable: true
     }
+  });
+  if (parent) child.__proto__ = parent;
+};
 
-    PN532_I2C.__proto__ = ($__super !== null ? $__super : Function.prototype);
-    PN532_I2C.prototype = $__Object$create(($__super !== null ? $__super.prototype : null));
+var Promise = require("bluebird");
+var EventEmitter = require("events").EventEmitter;
+var logger = require("winston").loggers.get("i2c");
 
-    $__Object$defineProperty(PN532_I2C.prototype, "constructor", {
-        value: PN532_I2C
+var PN532_I2C = (function () {
+  var _EventEmitter = EventEmitter;
+  var PN532_I2C = function PN532_I2C(wire) {
+    this.wire = wire;
+  };
+
+  _inherits(PN532_I2C, _EventEmitter);
+
+  PN532_I2C.prototype.init = function () {
+    var _this = this;
+    logger.debug("Initializing I2C...");
+    return new Promise(function (resolve, reject) {
+      _this.wire.on("data", function (data) {
+        _this.emit("data", data);
+      });
+
+      _this.wire.on("error", function (error) {
+        _this.emit("error", error);
+      });
+
+      resolve();
     });
+  };
 
-    $__Object$defineProperty(PN532_I2C.prototype, "init", {
-        value: function() {
-            logger.debug('Initializing I2C...');
-            return new Promise(function(resolve, reject) {
-                this.wire.on('data', function(data) {
-                    this.emit('data', data);
-                }.bind(this));
+  PN532_I2C.prototype.write = function (buffer) {
+    this.wire.write(buffer);
+  };
 
-                this.wire.on('error', function(error) {
-                    this.emit('error', error);
-                }.bind(this));
-
-                resolve();
-            }.bind(this));
-        },
-
-        enumerable: false,
-        writable: true
-    });
-
-    $__Object$defineProperty(PN532_I2C.prototype, "write", {
-        value: function(buffer) {
-            this.wire.write(buffer);
-        },
-
-        enumerable: false,
-        writable: true
-    });
-
-    return PN532_I2C;
-}(EventEmitter);
+  return PN532_I2C;
+})();
 
 module.exports = PN532_I2C;

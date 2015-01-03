@@ -1,76 +1,85 @@
-var $__Object$defineProperty = Object.defineProperty;
-var $__Object$create = Object.create;
-var util = require('util');
-var EventEmitter = require('events').EventEmitter;
-var logger = require('winston').loggers.get('frame-emitter');
-var frame = require('./frame');
+"use strict";
+
+var _inherits = function (child, parent) {
+  child.prototype = Object.create(parent && parent.prototype, {
+    constructor: {
+      value: child,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (parent) child.__proto__ = parent;
+};
+
+var util = require("util");
+var EventEmitter = require("events").EventEmitter;
+var logger = require("winston").loggers.get("frame-emitter");
+
+var frame = require("./frame");
 var Frame = frame.Frame;
 var DataFrame = frame.DataFrame;
 var ErrorFrame = frame.ErrorFrame;
 
-var FrameEmitter = function($__super) {
-    "use strict";
-
+var FrameEmitter = (function () {
+  var _EventEmitter = EventEmitter;
+  var FrameEmitter = (
+    /*
+        @constructor
+        @param {object} hal - An instance of PN532_UART or PN532_I2C
+    */
     function FrameEmitter(hal) {
-        this.hal = hal;
-        this.buffer = new Buffer(0);
+      var _this = this;
+      this.hal = hal;
+      this.buffer = new Buffer(0);
 
-        logger.debug('listening to data');
+      logger.debug("listening to data");
 
-        // console.dir(hal);
-        this.hal.on('data', function(data) {
-            logger.debug('Data received', util.inspect(data));
-            this.buffer = Buffer.concat([this.buffer, data]);
-            this._processBuffer();
-        }.bind(this));
+      // console.dir(hal);
+      this.hal.on("data", function (data) {
+        logger.debug("Data received", util.inspect(data));
+        _this.buffer = Buffer.concat([_this.buffer, data]);
+        _this._processBuffer();
+      });
 
-        this.hal.on('error', function(error) {
-            this.emit('error', error);
-        }.bind(this));
+      this.hal.on("error", function (error) {
+        _this.emit("error", error);
+      });
     }
+  );
 
-    FrameEmitter.__proto__ = ($__super !== null ? $__super : Function.prototype);
-    FrameEmitter.prototype = $__Object$create(($__super !== null ? $__super.prototype : null));
+  _inherits(FrameEmitter, _EventEmitter);
 
-    $__Object$defineProperty(FrameEmitter.prototype, "constructor", {
-        value: FrameEmitter
-    });
+  FrameEmitter.prototype._processBuffer = function () {
+    // TODO: filter garbage at front of buffer (anything not 0x00, 0x00, 0xFF at start?)
 
-    $__Object$defineProperty(FrameEmitter.prototype, "_processBuffer", {
-        value: function() {
-            // TODO: filter garbage at front of buffer (anything not 0x00, 0x00, 0xFF at start?)
+    logger.debug("processing buffer", util.inspect(this.buffer));
 
-            logger.debug('processing buffer', util.inspect(this.buffer));
+    if (Frame.isFrame(this.buffer)) {
+      logger.debug("Frame found in buffer", util.inspect(this.buffer));
 
-            if (Frame.isFrame(this.buffer)) {
-                logger.debug('Frame found in buffer', util.inspect(this.buffer));
+      var frame = Frame.fromBuffer(this.buffer);
+      this.emit("frame", frame);
 
-                var frame = Frame.fromBuffer(this.buffer);
-                this.emit('frame', frame);
+      if (frame instanceof ErrorFrame) {
+        logger.error("ErrorFrame found in buffer", util.inspect(frame));
+        this.emit("error", frame);
+      } else if (frame instanceof DataFrame) {
+        logger.debug("DataFrame found in buffer", util.inspect(frame));
+        this.emit("response", frame);
+      }
 
-                if (frame instanceof ErrorFrame) {
-                    logger.error('ErrorFrame found in buffer', util.inspect(frame));
-                    this.emit('error', frame);
-                } else if (frame instanceof DataFrame) {
-                    logger.debug('DataFrame found in buffer', util.inspect(frame));
-                    this.emit('response', frame);
-                }
+      this.buffer = this.buffer.slice(frame.getFrameLength()); // strip off frame's data from buffer
 
-                this.buffer = this.buffer.slice(frame.getFrameLength()); // strip off frame's data from buffer
+      // If more data still on buffer, process buffer again,
+      // otherwise next 'data' event on serial will process the buffer after more data is receive
+      if (this.buffer.length) {
+        this._processBuffer();
+      }
+    }
+  };
 
-                // If more data still on buffer, process buffer again,
-                // otherwise next 'data' event on serial will process the buffer after more data is receive
-                if (this.buffer.length) {
-                    this._processBuffer();
-                }
-            }
-        },
-
-        enumerable: false,
-        writable: true
-    });
-
-    return FrameEmitter;
-}(EventEmitter);
+  return FrameEmitter;
+})();
 
 exports.FrameEmitter = FrameEmitter;

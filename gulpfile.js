@@ -1,6 +1,6 @@
 /* jshint strict: false */
 var gulp = require('gulp');
-var esnext = require('gulp-esnext');
+var to5 = require('gulp-6to5');
 var del = require('del');
 
 
@@ -10,7 +10,7 @@ gulp.task('clean', function (cb) {
 
 gulp.task('build', ['clean'], function () {
     return gulp.src('src/*.js')
-        .pipe(esnext())
+        .pipe(to5())
         .pipe(gulp.dest('dist'));
 });
 
