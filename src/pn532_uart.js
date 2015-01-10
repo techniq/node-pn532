@@ -34,7 +34,7 @@ class PN532_UART extends EventEmitter {
     write(buffer) {
         if (!this.isAwake) {
             logger.debug('Waking up PN532...');
-            var wakeup = new Buffer([0x55, 0x55, 0x00, 0x00, 0x00]);
+            var wakeup = new Buffer([0x55, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
             buffer = Buffer.concat([wakeup, buffer]);
             this.isAwake = true;
         }

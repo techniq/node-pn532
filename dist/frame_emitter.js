@@ -20,6 +20,8 @@ var frame = require("./frame");
 var Frame = frame.Frame;
 var DataFrame = frame.DataFrame;
 var ErrorFrame = frame.ErrorFrame;
+var AckFrame = frame.AckFrame;
+var NackFrame = frame.NackFrame;
 
 var FrameEmitter = (function () {
   var _EventEmitter = EventEmitter;
@@ -43,6 +45,7 @@ var FrameEmitter = (function () {
       });
 
       this.hal.on("error", function (error) {
+        logger.error("Error on HAL", error);
         _this.emit("error", error);
       });
     }
@@ -53,20 +56,26 @@ var FrameEmitter = (function () {
   FrameEmitter.prototype._processBuffer = function () {
     // TODO: filter garbage at front of buffer (anything not 0x00, 0x00, 0xFF at start?)
 
-    logger.debug("processing buffer", util.inspect(this.buffer));
+    logger.debug("Processing buffer", util.inspect(this.buffer));
 
     if (Frame.isFrame(this.buffer)) {
-      logger.debug("Frame found in buffer", util.inspect(this.buffer));
+      logger.debug("Frame found in buffer");
 
       var frame = Frame.fromBuffer(this.buffer);
+      // logger.info('Frame', frame.toString());
+      logger.info("Frame", util.inspect(frame));
       this.emit("frame", frame);
 
       if (frame instanceof ErrorFrame) {
-        logger.error("ErrorFrame found in buffer", util.inspect(frame));
+        logger.error("ErrorFrame found in buffer");
         this.emit("error", frame);
       } else if (frame instanceof DataFrame) {
-        logger.debug("DataFrame found in buffer", util.inspect(frame));
+        logger.debug("DataFrame found in buffer");
         this.emit("response", frame);
+      } else if (frame instanceof AckFrame) {
+        logger.debug("AckFrame found in buffer");
+      } else if (frame instanceof NackFrame) {
+        logger.debug("NackFrame found in buffer");
       }
 
       this.buffer = this.buffer.slice(frame.getFrameLength()); // strip off frame's data from buffer

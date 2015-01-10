@@ -12,6 +12,8 @@ var _inherits = function (child, parent) {
   if (parent) child.__proto__ = parent;
 };
 
+var util = require("util");
+
 var c = require("./constants");
 
 var PREAMBLE = 0;
@@ -32,6 +34,10 @@ Frame.prototype.getFrameLength = function () {
 // Convert Frame instance to a Buffer instance
 Frame.prototype.toBuffer = function () {
   throw new Error("Implement in subclass");
+};
+
+Frame.prototype.inspect = function () {
+  return util.format("<Frame>");
 };
 
 Frame.fromBuffer = function (buffer) {
@@ -88,6 +94,18 @@ var DataFrame = (function () {
   );
 
   _inherits(DataFrame, _Frame);
+
+  DataFrame.prototype.toJSON = function () {
+    return {
+      direction: this.getDirection(),
+      data: {
+        command: this.getDataCommand(),
+        body: this.getDataBody() } };
+  };
+
+  DataFrame.prototype.inspect = function () {
+    return util.format("<DataFrame %j>", this.toJSON());
+  };
 
   // Gets the frame's direction
   DataFrame.prototype.getDirection = function () {
@@ -186,6 +204,10 @@ var AckFrame = (function () {
     return new Buffer([PREAMBLE, START_CODE_1, START_CODE_2, 0, 255, POSTAMBLE]);
   };
 
+  AckFrame.prototype.inspect = function () {
+    return util.format("<AckFrame %j>", this.toBuffer());
+  };
+
   return AckFrame;
 })();
 
@@ -208,6 +230,10 @@ var NackFrame = (function () {
 
   NackFrame.prototype.toBuffer = function () {
     return new Buffer([PREAMBLE, START_CODE_1, START_CODE_2, 255, 0, POSTAMBLE]);
+  };
+
+  NackFrame.prototype.inspect = function () {
+    return util.format("<NackFrame %j>", this.toBuffer());
   };
 
   return NackFrame;
@@ -254,3 +280,6 @@ exports.DataFrame = DataFrame;
 exports.AckFrame = AckFrame;
 exports.NackFrame = NackFrame;
 exports.ErrorFrame = ErrorFrame;
+// checksum: this.getDataChecksum(),
+// length: this.getDataLength(),
+// lengthChecksum: this.getDataLengthChecksum()

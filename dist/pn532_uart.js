@@ -52,7 +52,7 @@ var PN532_UART = (function () {
   PN532_UART.prototype.write = function (buffer) {
     if (!this.isAwake) {
       logger.debug("Waking up PN532...");
-      var wakeup = new Buffer([85, 85, 0, 0, 0, 0, 0, 0, 0, 0]);
+      var wakeup = new Buffer([85, 85, 0, 0, 0, 0, 0, 0, 0]);
       buffer = Buffer.concat([wakeup, buffer]);
       this.isAwake = true;
     }
