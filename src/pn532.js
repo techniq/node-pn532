@@ -36,15 +36,15 @@ class PN532 extends EventEmitter {
 
         this.on('newListener', (event) => {
             // TODO: Only poll once (for each event type)
-            if (event === 'card') {
-                logger.debug('Polling for card scans...');
-                var pollCard = () => {
-                    this.readPassiveTargetId().then((card) => {
-                        this.emit('card', card);
-                        setTimeout(() => pollCard(), this.pollInterval);
+            if (event === 'tag') {
+                logger.debug('Polling for tag scans...');
+                var scanTag = () => {
+                    this.scanTag().then((tag) => {
+                        this.emit('tag', tag);
+                        setTimeout(() => scanTag(), this.pollInterval);
                     });
                 };
-                pollCard();
+                scanTag();
             }
         });
     }
@@ -127,18 +127,22 @@ class PN532 extends EventEmitter {
             });
     }
 
-    readPassiveTargetId() {
-        logger.info('Reading passive target id...');
+    scanTag() {
+        logger.info('Scanning tag...');
+
+        var maxNumberOfTargets = 0x01;
+        var baudRate = c.CARD_ISO14443A;
 
         var commandBuffer = [
             c.COMMAND_IN_LIST_PASSIVE_TARGET,
-            0x01,
-            c.CARD_ISO14443A
+            maxNumberOfTargets,
+            baudRate
         ];
 
         return this.sendCommand(commandBuffer)
             .then((frame) => {
                 var body = frame.getDataBody();
+                logger.debug('body', util.inspect(body));
 
                 var numberOfTags = body[0];
                 if (numberOfTags === 1) {
@@ -151,8 +155,8 @@ class PN532 extends EventEmitter {
                                   .join(':');
 
                     return {
-                        SENS_RES: body.slice(2, 4),
-                        SEL_RES: body[4],
+                        ATQA: body.slice(2, 4), // SENS_RES
+                        SAK: body[4],           // SEL_RES
                         uid: uid
                     };
                 }
