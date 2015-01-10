@@ -31,7 +31,7 @@ class PN532 extends EventEmitter {
 
         this.frameEmitter = new FrameEmitter(this.hal);
         this.hal.init().then(() => {
-            this.samConfig().then(() => this.emit('ready'));
+            this.configureSecureAccessModule().then(() => this.emit('ready'));
         });
 
         this.on('newListener', (event) => {
@@ -86,7 +86,7 @@ class PN532 extends EventEmitter {
         });
     }
 
-    samConfig() {
+    configureSecureAccessModule() {
         logger.info('Configuring secure access module (SAM)...');
 
         // TODO: Test IRQ triggered reads
