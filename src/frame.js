@@ -1,3 +1,5 @@
+var util = require('util');
+
 var c = require('./constants');
 
 var PREAMBLE     = 0x00;
@@ -17,6 +19,10 @@ class Frame {
     // Convert Frame instance to a Buffer instance
     toBuffer() {
         throw new Error('Implement in subclass');
+    }
+
+    inspect() {
+        return util.format('<Frame>');
     }
 
     static fromBuffer(buffer) {
@@ -72,6 +78,23 @@ class DataFrame extends Frame {
         } else {
             throw new Error('data must be an instanceof a Buffer or Array');
         }
+    }
+
+    toJSON() {
+        return {
+            direction: this.getDirection(),
+            data: {
+                command: this.getDataCommand(),
+                body: this.getDataBody(),
+                // checksum: this.getDataChecksum(),
+                // length: this.getDataLength(),
+                // lengthChecksum: this.getDataLengthChecksum()
+            },
+        };
+    }
+
+    inspect() {
+        return util.format('<DataFrame %j>', this.toJSON());
     }
 
     // Gets the frame's direction
@@ -189,6 +212,10 @@ class AckFrame extends Frame {
             POSTAMBLE
         ]);
     }
+
+    inspect() {
+        return util.format('<AckFrame %j>', this.toBuffer());
+    }
 }
 
 class NackFrame extends Frame {
@@ -221,6 +248,10 @@ class NackFrame extends Frame {
             0x00,
             POSTAMBLE
         ]);
+    }
+    
+    inspect() {
+        return util.format('<NackFrame %j>', this.toBuffer());
     }
 }
 
