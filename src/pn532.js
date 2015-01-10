@@ -49,7 +49,7 @@ class PN532 extends EventEmitter {
         });
     }
 
-    writeCommand(commandBuffer) {
+    sendCommand(commandBuffer) {
         return new Promise((resolve, reject) => {
 
             var removeListeners = () => {
@@ -60,7 +60,7 @@ class PN532 extends EventEmitter {
 
             // Wire up listening to wait for response (or error) from PN532
             var onFrame = (frame) => {
-                logger.debug('response received for writeCommand', util.inspect(frame));
+                logger.debug('Response received for sendCommand', util.inspect(frame));
                 // TODO: If no ACK after 15ms, resend? (page 40 of user guide, UART only)?
 
                 if (frame instanceof DataFrame) {
@@ -72,7 +72,7 @@ class PN532 extends EventEmitter {
             this.frameEmitter.on('frame', onFrame);
 
             var onError = (error) => {
-                logger.error('error received for writeCommand', error);
+                logger.error('Error received for sendCommand', error);
                 removeListeners();
                 reject(error);
             };
@@ -81,7 +81,7 @@ class PN532 extends EventEmitter {
             // Send command to PN532
             var dataFrame = new DataFrame(commandBuffer);
             var buffer = dataFrame.toBuffer();
-            logger.debug('Sending buffer: ', util.inspect(buffer));
+            logger.debug('Sending buffer:', util.inspect(buffer));
             this.hal.write(buffer);
         });
     }
@@ -99,13 +99,13 @@ class PN532 extends EventEmitter {
             timeout,
             c.SAMCONFIGURATION_IRQ_ON // Use IRQ pin
         ];
-        return this.writeCommand(commandBuffer);
+        return this.sendCommand(commandBuffer);
     }
 
     getFirmwareVersion() {
         logger.info('Getting firmware version...');
 
-        return this.writeCommand([c.COMMAND_GET_FIRMWARE_VERSION])
+        return this.sendCommand([c.COMMAND_GET_FIRMWARE_VERSION])
             .then((frame) => {
                 var body = frame.getDataBody();
                 return {
@@ -120,7 +120,7 @@ class PN532 extends EventEmitter {
     getGeneralStatus() {
         logger.info('Getting general status...');
 
-        return this.writeCommand([c.COMMAND_GET_GENERAL_STATUS])
+        return this.sendCommand([c.COMMAND_GET_GENERAL_STATUS])
             .then((frame) => {
                 var body = frame.getDataBody();
                 return body;
@@ -136,7 +136,7 @@ class PN532 extends EventEmitter {
             c.CARD_ISO14443A
         ];
 
-        return this.writeCommand(commandBuffer)
+        return this.sendCommand(commandBuffer)
             .then((frame) => {
                 var body = frame.getDataBody();
 
