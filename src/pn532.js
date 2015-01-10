@@ -53,7 +53,7 @@ class PN532 extends EventEmitter {
         return new Promise((resolve, reject) => {
 
             var removeListeners = () => {
-                logger.debug('removing listeners');
+                logger.debug('Removing listeners');
                 this.frameEmitter.removeListener('frame', onFrame);
                 this.frameEmitter.removeListener('error', onError);
             };
@@ -63,8 +63,10 @@ class PN532 extends EventEmitter {
                 logger.debug('Response received for sendCommand', util.inspect(frame));
                 // TODO: If no ACK after 15ms, resend? (page 40 of user guide, UART only)?
 
-                if (frame instanceof DataFrame) {
-                    logger.debug('isResponse', util.inspect(frame));
+                if (frame instanceof AckFrame) {
+                    logger.info('Command Acknowledged', util.inspect(frame));
+                } else if (frame instanceof DataFrame) {
+                    logger.info('Command Response', util.inspect(frame));
                     removeListeners();
                     resolve(frame);
                 }
