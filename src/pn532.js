@@ -17,7 +17,7 @@ class PN532 extends EventEmitter {
     */
     constructor(hal, options) {
         options = options || {};
-        this.pollInterval = options.pollInternal || 1000;
+        this.pollInterval = options.pollInterval || 1000;
 
         if (hal.constructor.name === 'SerialPort') {
             var PN532_UART = require('./pn532_uart');
