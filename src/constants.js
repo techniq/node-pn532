@@ -71,3 +71,16 @@ exports.CARD_FELICA212 = 0x01; // 212 kbps (FeliCa polling)
 exports.CARD_FELICA414 = 0x02; // 424 kbps (FeliCa polling)
 exports.CARD_ISO14443B = 0x03; // 106 kbps type B (ISO/IEC14443-3B)
 exports.CARD_JEWEL     = 0x04; // 106 kbps Innovision Jewel tag
+
+exports.MIFARE_COMMAND_AUTH_A   = 0x60;
+exports.MIFARE_COMMAND_AUTH_B   = 0x61;
+exports.MIFARE_COMMAND_READ     = 0x30;
+exports.MIFARE_COMMAND_WRITE_4 = 0xA2;
+exports.MIFARE_COMMAND_WRITE_16 = 0xA0;
+
+exports.TAG_MEM_NULL_TLV        = 0x00;
+exports.TAG_MEM_LOCK_TLV        = 0x01;
+exports.TAG_MEM_MEMCONTROL_TLV  = 0x02;
+exports.TAG_MEM_NDEF_TLV        = 0x03;
+exports.TAG_MEM_PROPRIETARY_TLV = 0xFD;
+exports.TAG_MEM_TERMINATOR_TLV  = 0xFE;

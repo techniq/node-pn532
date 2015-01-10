@@ -1,12 +1,12 @@
 # PN532
 
-Driver for the PN532 NFC chip.  Provides a promise-based API, and requires either:
+Driver for the PN532 NFC chip.  Provides an event and promise-based API, and requires either:
 - [node-serialport](https://github.com/voodootikigod/node-serialport)
 - [node-i2c](https://github.com/kelly/node-i2c)
 
 This implementation does not require libnfc, and should work on both X86 (32-bit or 64-bit) and ARM (RPi / Beaglebone) systems
 
-Testing on a Mac OSX 10.9 system using UART/FTDI cable to an [Adafruit breakout board](https://www.adafruit.com/products/364)
+Tested on a Mac OSX 10.9 system using a UART/FTDI cable to an [Adafruit breakout board](https://www.adafruit.com/products/364)
 and on a BeagleBone using UART.  I2C support is currently untested at the moment.
 
 API is subject to change until the 1.0.0 release
@@ -32,26 +32,79 @@ var pn532 = require('pn532');
 var i2c = require('i2c');
 
 var wire = new i2c(pn532.I2C_ADDRESS, {device: '/dev/i2c-1'});
-var pn532 = new pn532.PN532(wire);
+var rfid = new pn532.PN532(wire);
 ```
 
-#### Actively poll for NFC tag/card
+#### Scan a tag
 ```js
 rfid.on('ready', function() {
-    console.log('Listening for a card scan...');
-    rfid.on('card', function(data) {
-        console.log(Date.now(), 'card:', data.uid);
+    rfid.scanTag().then(function(tag) {
+        console.log('tag:', tag.uid);
     });
 });
 ```
 
-#### Getting the firmware version (using Promises)
+#### Poll for a tag
+```js
+rfid.on('ready', function() {
+    console.log('Listening for a tag scan...');
+    rfid.on('tag', function(tag) {
+        console.log('tag:', tag.uid);
+    });
+});
+```
+
+### Read and write tag data (using [ndef library](https://www.npmjs.com/package/ndef))
+Tested using NTAG203 tags.  Should support other NTAG and Mifare Ultralight tags.  Mifare Classic tags are NOT currently supported, but should be in the future.
+
+#### Read
+```js
+rfid.on('ready', function() {
+    rfid.on('tag', function(tag) {
+        rfid.readNdefData().then(function(data) {
+            var records = ndef.decodeMessage(data.toJSON());
+            console.log(records);
+        });
+    });
+});
+```
+#### Write
+```js
+rfid.on('ready', function() {
+    rfid.scanTag().then(function(tag) {
+        var messages = [
+            ndef.uriRecord('http://www.google.com'),
+            ndef.textRecord('test')
+        ];
+        var data = ndef.encodeMessage(messages);
+
+        rfid.writeNdefData(data).then(function(response) {
+            console.log('Write successful');
+        });
+    });
+});
+```
+
+#### Retrieve the firmware version
 ```js
 rfid.on('ready', function() {
     rfid.getFirmwareVersion().then(function(data) {
         console.log('firmware: ', data);
     });
 });
+```
+
+### Examples
+Working examples available under the `examples` directory.  They should be ran with `6to5-node filename.js`, or replace:
+
+```js
+var pn532 = require('../src/pn532');
+```
+
+with
+
+```js
+var pn532 = require('../dist/pn532');
 ```
 
 

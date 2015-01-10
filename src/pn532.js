@@ -7,7 +7,9 @@ setupLogging(process.env.PN532_LOGGING);
 var logger = require('winston').loggers.get('pn532');
 
 var FrameEmitter = require('./frame_emitter').FrameEmitter;
-var DataFrame = require('./frame').DataFrame;
+var frame = require('./frame');
+var DataFrame = frame.DataFrame;
+var AckFrame = frame.AckFrame;
 var c = require('./constants');
 
 class PN532 extends EventEmitter {
@@ -163,6 +165,210 @@ class PN532 extends EventEmitter {
                     };
                 }
             });
+    }
+
+    readBlock(options) {
+        logger.info('Reading block...');
+
+        var options = options || {};
+
+        var tagNumber = options.tagNumber || 0x01;
+        var blockAddress = options.blockAddress || 0x01;
+
+        var commandBuffer = [
+            c.COMMAND_IN_DATA_EXCHANGE,
+            tagNumber,
+            c.MIFARE_COMMAND_READ,
+            blockAddress,
+        ];
+
+        return this.sendCommand(commandBuffer)
+            .then((frame) => {
+                var body = frame.getDataBody();
+                logger.debug('Frame data from block read:', util.inspect(body));
+
+                var status = body[0];
+
+                if (status === 0x13) {
+                    logger.warn('The data format does not match to the specification.');
+                }
+                var block = body.slice(1, body.length - 1); // skip status byte and last byte (not part of memory)
+                // var unknown = body[body.length];
+
+                return block;
+        });
+    }
+
+    readNdefData() {
+        logger.info('Reading data...');
+
+        return this.readBlock({blockAddress: 0x04})
+            .then((block) => {
+                logger.debug('block:', util.inspect(block));
+
+                // Find NDEF TLV (0x03) in block of data - See NFC Forum Type 2 Tag Operation Section 2.4 (TLV Blocks)
+                var ndefValueOffset = null;
+                var ndefLength = null;
+                var blockOffset = 0;
+
+                while (ndefValueOffset === null) {
+                    logger.debug('blockOffset:', blockOffset, 'block.length:', block.length);
+                    if (blockOffset >= block.length) {
+                        throw new Error('Unable to locate NDEF TLV (0x03) byte in block:', block)
+                    }
+
+                    var type = block[blockOffset];       // Type of TLV
+                    var length = block[blockOffset + 1]; // Length of TLV
+                    logger.debug('blockOffset', blockOffset);
+                    logger.debug('type', type, 'length', length);
+
+                    if (type === c.TAG_MEM_NDEF_TLV) {
+                        logger.debug('NDEF TLV found');
+                        ndefLength = length;                  // Length proceeds NDEF_TLV type byte
+                        ndefValueOffset = blockOffset + 2;    // Value (NDEF data) proceeds NDEV_TLV length byte
+                        logger.debug('ndefLength:', ndefLength);
+                        logger.debug('ndefValueOffset:', ndefValueOffset);
+                    } else {
+                        // Skip TLV (type byte, length byte, plus length of value)
+                        blockOffset = blockOffset + 2 + length;
+                    }
+                }
+
+                var ndefData = block.slice(ndefValueOffset, block.length);
+                var additionalBlocks = Math.ceil((ndefValueOffset + ndefLength) / 16) - 1;
+                logger.debug('Additional blocks needing to retrieve:', additionalBlocks);
+
+                // Sequentially grab each additional 16-byte block (or 4x 4-byte pages) of data, chaining promises
+                var self = this;
+                var allDataPromise = (function retrieveBlock(blockNum) {
+                    if (blockNum <= additionalBlocks) {
+                        var blockAddress = 4 * (blockNum + 1);
+                        logger.debug('Retrieving block:', blockNum, 'at blockAddress:', blockAddress);
+                        return self.readBlock({blockAddress: blockAddress})
+                            .then(function(block) {
+                                blockNum++;
+                                ndefData = Buffer.concat([ndefData, block]);
+                                return retrieveBlock(blockNum);
+                            });
+                    }
+                })(1);
+
+                return allDataPromise.then(() => ndefData.slice(0, ndefLength));
+            })
+            .catch(function(error) {
+                logger.error('ERROR:', error);
+            });
+    }
+
+    writeBlock(block, options) {
+        logger.info('Writing block...');
+
+        var options = options || {};
+
+        var tagNumber = options.tagNumber || 0x01;
+        var blockAddress = options.blockAddress || 0x01;
+
+        var commandBuffer = [].concat([
+            c.COMMAND_IN_DATA_EXCHANGE,
+            tagNumber,
+            c.MIFARE_COMMAND_WRITE_4,
+            blockAddress
+        ],  block);
+
+        return this.sendCommand(commandBuffer)
+            .then((frame) => {
+                var body = frame.getDataBody();
+                logger.debug('Frame data from block write:', util.inspect(body));
+
+                var status = body[0];
+
+                if (status === 0x13) {
+                    logger.warn('The data format does not match to the specification.');
+                }
+                var block = body.slice(1, body.length - 1); // skip status byte and last byte (not part of memory)
+                // var unknown = body[body.length];
+
+                return block;
+            });
+    }
+
+    writeNdefData(data) {
+        logger.info('Writing data...');
+
+        // Prepend data with NDEF type and length (TLV) and append terminator TLV
+        var block = [].concat([
+            c.TAG_MEM_NDEF_TLV,
+            data.length
+        ],  data, [
+            c.TAG_MEM_TERMINATOR_TLV
+        ]);
+
+        logger.debug('block:', util.inspect(new Buffer(block)));
+
+        var PAGE_SIZE = 4;
+        var totalBlocks = Math.ceil(block.length / PAGE_SIZE);
+
+        // Sequentially write each additional 4-byte pages of data, chaining promises
+        var self = this;
+        var allPromises = (function writeBlock(blockNum) {
+            if (blockNum < totalBlocks) {
+                var blockAddress = 0x04 + blockNum;
+                var pageData = block.splice(0, PAGE_SIZE);
+
+                if (pageData.length < PAGE_SIZE) {
+                    pageData.length = PAGE_SIZE; // Setting length will make sure NULL TLV (0x00) are written at the end of the page
+                }
+
+                logger.debug('Writing block:', blockNum, 'at blockAddress:', blockAddress);
+                logger.debug('pageData:', util.inspect(new Buffer(pageData)));
+                return self.writeBlock(pageData, {blockAddress: blockAddress})
+                .then(function(block) {
+                    blockNum++;
+                    // ndefData = Buffer.concat([ndefData, block]);
+                    return writeBlock(blockNum);
+                });
+            }
+        })(0);
+
+        // return allDataPromise.then(() => ndefData.slice(0, ndefLength));
+        return allPromises;
+    }
+
+    // WIP
+    authenticateBlock(uid, options) {
+        logger.info('Authenticating block...');
+
+        var options = options || {};
+
+        var blockAddress = options.blockAddress || 0x04;
+        var authType = options.authType || c.MIFARE_COMMAND_AUTH_A
+        var authKey = options.authKey || [0xff, 0xff, 0xff, 0xff, 0xff, 0xff];
+        var tagNumber = options.tagNumber || 0x01;
+        var uidArray = uid.split(':').map(s => Number('0x' + s));
+
+        var commandBuffer = [
+        c.COMMAND_IN_DATA_EXCHANGE,
+        tagNumber,
+        authType,
+        blockAddress,
+        ].concat(authKey).concat(uidArray);
+
+        return this.sendCommand(commandBuffer)
+        .then((frame) => {
+            var body = frame.getDataBody();
+            logger.info('Frame data from mifare classic authenticate', util.inspect(body));
+
+            console.log('body', body);
+            return body;
+
+            // var status = body[0];
+            // var tagData = body.slice(1, body.length);
+
+            // return {
+            //     status: status.toString(16),
+            //     tagData: tagData
+            // };
+        });
     }
 }
 
