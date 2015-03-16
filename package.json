@@ -1,6 +1,6 @@
 {
   "name": "pn532",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Library to run the PN532 RFID Reader",
   "repository": "https://github.com/techniq/node-pn532",
   "author": "Sean Lynch <techniq35@gmail.com>",
