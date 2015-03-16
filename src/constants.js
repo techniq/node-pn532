@@ -38,14 +38,14 @@ exports.COMMAND_IN_RELEASE             = 0x52;
 exports.COMMAND_IN_SELECT              = 0x54;
 exports.COMMAND_IN_AUTO_POLL           = 0x60;
 // Target
-exports.TG_INIT_AS_TARGET              = 0x8C;
-exports.TG_SET_GENERAL_BYTES           = 0x92;
-exports.TG_GET_DATA                    = 0x86;
-exports.TG_SET_DATA                    = 0x8E;
-exports.TG_SET_META_DATA               = 0x94;
-exports.TG_GET_INITIATOR_COMMAND       = 0x88;
-exports.TG_RESPONSE_TO_INITIATOR       = 0x90;
-exports.TG_GET_TARGET_STATUS           = 0x8A;
+exports.COMMAND_TG_INIT_AS_TARGET              = 0x8C;
+exports.COMMAND_TG_SET_GENERAL_BYTES           = 0x92;
+exports.COMMAND_TG_GET_DATA                    = 0x86;
+exports.COMMAND_TG_SET_DATA                    = 0x8E;
+exports.COMMAND_TG_SET_META_DATA               = 0x94;
+exports.COMMAND_TG_GET_INITIATOR_COMMAND       = 0x88;
+exports.COMMAND_TG_RESPONSE_TO_INITIATOR       = 0x90;
+exports.COMMAND_TG_GET_TARGET_STATUS           = 0x8A;
 
 // Frame Identifiers (TFI)
 exports.DIRECTION_HOST_TO_PN532        = 0xD4;
@@ -84,3 +84,8 @@ exports.TAG_MEM_MEMCONTROL_TLV  = 0x02;
 exports.TAG_MEM_NDEF_TLV        = 0x03;
 exports.TAG_MEM_PROPRIETARY_TLV = 0xFD;
 exports.TAG_MEM_TERMINATOR_TLV  = 0xFE;
+
+// ISO7816-4 commands
+exports.ISO7816_SELECT_FILE     = 0xA4;
+exports.ISO7816_READ_BINARY     = 0xB0;
+exports.ISO7816_UPDATE_BINARY   = 0xD6;
