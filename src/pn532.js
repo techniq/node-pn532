@@ -347,10 +347,10 @@ class PN532 extends EventEmitter {
         var uidArray = uid.split(':').map(s => Number('0x' + s));
 
         var commandBuffer = [
-        c.COMMAND_IN_DATA_EXCHANGE,
-        tagNumber,
-        authType,
-        blockAddress,
+            c.COMMAND_IN_DATA_EXCHANGE,
+            tagNumber,
+            authType,
+            blockAddress
         ].concat(authKey).concat(uidArray);
 
         return this.sendCommand(commandBuffer)
