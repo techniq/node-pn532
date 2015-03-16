@@ -95,7 +95,7 @@ rfid.on('ready', function() {
 ```
 
 ### Examples
-Working examples available under the `examples` directory.  They should be ran with `6to5-node filename.js`, or replace:
+Working examples are available under the `examples` directory.  They should be ran with `6to5-node filename.js`, or replace:
 
 ```js
 var pn532 = require('../src/pn532');
