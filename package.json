@@ -21,6 +21,7 @@
   },
   "optionalDependencies": {
     "serialport": "^1.4.8",
-    "i2c": "^0.1.4"
+    "i2c": "^0.2.1"
   },
+  "engine": "node >= 0.12.0"
 }
