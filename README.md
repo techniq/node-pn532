@@ -54,8 +54,17 @@ rfid.on('ready', function() {
 });
 ```
 
+#### Retrieve the firmware version
+```js
+rfid.on('ready', function() {
+    rfid.getFirmwareVersion().then(function(data) {
+        console.log('firmware: ', data);
+    });
+});
+```
+
 ### Read and write tag data (using [ndef library](https://www.npmjs.com/package/ndef))
-Tested using NTAG203 tags.  Should support other NTAG and Mifare Ultralight tags.  Mifare Classic tags are NOT currently supported, but should be in the future.
+Tested using NTAG203 tags.  Should support other NTAG and Mifare Ultralight tags.  Mifare Classic tags are currently NOT supported, but should be in the future.
 
 #### Read
 ```js
@@ -81,15 +90,6 @@ rfid.on('ready', function() {
         rfid.writeNdefData(data).then(function(response) {
             console.log('Write successful');
         });
-    });
-});
-```
-
-#### Retrieve the firmware version
-```js
-rfid.on('ready', function() {
-    rfid.getFirmwareVersion().then(function(data) {
-        console.log('firmware: ', data);
     });
 });
 ```
