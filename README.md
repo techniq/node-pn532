@@ -11,9 +11,8 @@ and on a BeagleBone using UART.  I2C support is currently untested at the moment
 
 API is subject to change until the 1.0.0 release
 
-### Links
-- [Datasheet](http://www.nxp.com/documents/short_data_sheet/PN532_C1_SDS.pdf)
-- [User manual](http://www.nxp.com/documents/user_manual/141520.pdf)
+### Install
+    npm install pn532
 
 ### Example
 
@@ -107,6 +106,9 @@ with
 var pn532 = require('../dist/pn532');
 ```
 
-
 ### Debug logging
 `PN532_LOGGING=debug node dist/example.js`
+
+### Links
+- [Datasheet](http://www.nxp.com/documents/short_data_sheet/PN532_C1_SDS.pdf)
+- [User manual](http://www.nxp.com/documents/user_manual/141520.pdf)
