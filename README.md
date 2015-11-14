@@ -2,17 +2,19 @@
 
 Driver for the PN532 NFC chip.  Provides an event and promise-based API, and requires either:
 - [node-serialport](https://github.com/voodootikigod/node-serialport)
-- [node-i2c](https://github.com/kelly/node-i2c)
+- [node-i2c](https://github.com/kelly/node-i2c) (WIP)
 
 This implementation does not require libnfc, and should work on both X86 (32-bit or 64-bit) and ARM (RPi / Beaglebone) systems
 
 Tested on a Mac OSX 10.9 system using a UART/FTDI cable to an [Adafruit breakout board](https://www.adafruit.com/products/364)
-and on a BeagleBone using UART.  I2C support is currently untested at the moment.
+and on a BeagleBone using UART.  I2C support is currently a WIP at the moment.
 
 API is subject to change until the 1.0.0 release
 
 ### Install
     npm install pn532
+
+and `npm install serialport` or `npm install i2c`
 
 ### Example
 
@@ -63,7 +65,7 @@ rfid.on('ready', function() {
 ```
 
 ### Read and write tag data (using [ndef library](https://www.npmjs.com/package/ndef))
-Tested using NTAG203 tags.  Should support other NTAG and Mifare Ultralight tags.  Mifare Classic tags are currently NOT supported, but should be in the future.
+Tested using NTAG203 tags.  Should support other NTAG and Mifare Ultralight tags.  Mifare Classic tags are currently NOT supported, but could be in the future.
 
 #### Read
 ```js
@@ -94,20 +96,10 @@ rfid.on('ready', function() {
 ```
 
 ### Examples
-Working examples are available under the `examples` directory.  They should be ran with `6to5-node filename.js`, or replace:
-
-```js
-var pn532 = require('../src/pn532');
-```
-
-with
-
-```js
-var pn532 = require('../dist/pn532');
-```
+Examples are available under the `examples` directory
 
 ### Debug logging
-`PN532_LOGGING=debug node dist/example.js`
+`PN532_LOGGING=debug node examples/card_scan.js`
 
 ### Links
 - [Datasheet](http://www.nxp.com/documents/short_data_sheet/PN532_C1_SDS.pdf)

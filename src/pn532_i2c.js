@@ -1,9 +1,10 @@
-var Promise = require('bluebird');
+'use strict';
 var EventEmitter = require('events').EventEmitter;
 var logger = require('winston').loggers.get('i2c');
 
 class PN532_I2C extends EventEmitter {
     constructor(wire) {
+        super();
         this.wire = wire;
     }
 

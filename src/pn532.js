@@ -1,5 +1,5 @@
+'use strict';
 var util = require('util');
-var Promise = require('bluebird');
 var EventEmitter = require('events').EventEmitter;
 
 var setupLogging = require('./logs');
@@ -18,6 +18,7 @@ class PN532 extends EventEmitter {
         @param {object} hal - An instance of node-serialport's SerialPort or node-i2c's i2c
     */
     constructor(hal, options) {
+        super();
         options = options || {};
         this.pollInterval = options.pollInterval || 1000;
 

@@ -1,9 +1,11 @@
-var Promise = require('bluebird');
+'use strict';
 var EventEmitter = require('events').EventEmitter;
+var util = require('util');
 var logger = require('winston').loggers.get('uart');
 
 class PN532_UART extends EventEmitter {
     constructor(serialPort) {
+        super();
         this.serial = serialPort;
         this.isAwake = false;
     }
@@ -13,7 +15,7 @@ class PN532_UART extends EventEmitter {
         return new Promise((resolve, reject) => {
             this.serial.on('open', (error) => {
                 if (error) {
-                    logger.error('Error opening serial port', error);
+                    logger.error('Error opening serial port:', util.inspect(error));
                     reject();
                 }
 
@@ -25,7 +27,7 @@ class PN532_UART extends EventEmitter {
                 resolve();
             });
             this.serial.on('error', (error) => {
-                logger.error('An error occurred on serial port', error);
+                logger.error('An error occurred on serial port:', util.inspect(error));
                 reject();
             });
         });

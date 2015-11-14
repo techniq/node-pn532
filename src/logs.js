@@ -1,6 +1,9 @@
+'use strict';
 var winston = require('winston');
 
-module.exports = function setupLogging(level='warn') {
+module.exports = function setupLogging(level) {
+    level = level || 'warn';
+
     // winston.loggers.options.transports = [
     //     new winston.transports.Console({
     //         level: 'debug',

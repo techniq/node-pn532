@@ -1,3 +1,4 @@
+'use strict';
 var util = require('util');
 
 var c = require('./constants');
@@ -61,6 +62,7 @@ class DataFrame extends Frame {
         @param {number} [direction=DIRECTION_HOST_TO_PN532] - Way of message (PN532 to HOST, or HOST to PN532.  See DIRECTION_* constants)
     */
     constructor(data, direction) {
+        super();
         if (data instanceof Buffer) {
             var buffer = data;
 
@@ -249,7 +251,7 @@ class NackFrame extends Frame {
             POSTAMBLE
         ]);
     }
-    
+
     inspect() {
         return util.format('<NackFrame %j>', this.toBuffer());
     }

@@ -1,3 +1,4 @@
+'use strict';
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 var logger = require('winston').loggers.get('frame-emitter');
@@ -15,6 +16,7 @@ class FrameEmitter extends EventEmitter {
         @param {object} hal - An instance of PN532_UART or PN532_I2C
     */
     constructor(hal) {
+        super();
         this.hal = hal;
         this.buffer = new Buffer(0);
 
