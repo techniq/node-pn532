@@ -103,8 +103,9 @@ Examples are available under the `examples` directory
 
 ### Note for Raspberry Pi 3 users
 If you are using this library to work with your NFC reader devices that uses UART in a Raspberry Pi 3, you will be encountering issue with the library not being able to detect the device or halt while processing/sending the buffer to the NFC Reader. This happens because Raspberry Pi 3 has changed a few things in its UART hardware
+
 TLDR Workaround:
-1. use /dev/ttyS0, instead of /dev/ttyAMA0
+1. use `/dev/ttyS0`, instead of `/dev/ttyAMA0`
 2. add "core_freq=250" in the "/boot/cmdline.txt"
 
 Instead of the old reference to the UART path (/dev/ttyAMA0), it is now referenced as (/dev/ttyS0)
