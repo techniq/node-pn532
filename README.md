@@ -101,6 +101,17 @@ Examples are available under the `examples` directory
 ### Debug logging
 `PN532_LOGGING=debug node examples/card_scan.js`
 
+### Note for Raspberry Pi 3 users
+If you are using this library to work with your NFC reader devices that uses UART in a Raspberry Pi 3, you will be encountering issue with the library not being able to detect the device or halt while processing/sending the buffer to the NFC Reader. This happens because Raspberry Pi 3 has changed a few things in its UART hardware
+TLDR Workaround:
+1. use /dev/ttyS0, instead of /dev/ttyAMA0
+2. add "core_freq=250" in the "/boot/cmdline.txt"
+
+Instead of the old reference to the UART path (/dev/ttyAMA0), it is now referenced as (/dev/ttyS0)
+- [Reference](http://elinux.org/RPi_Serial_Connection#Preventing_Linux_using_the_serial_port)
+The reassigned UART will follow the core clock frequency, which causes hiccups when you are communicating through UART, therefore you need to make this changes as well: - Add "core_freq=250" to the "/boot/cmdline.txt" file
+- [Reference](https://blog.adafruit.com/2016/03/07/raspberry-pi-3-uart-speed-workaround/)
+
 ### Links
 - [Datasheet](http://www.nxp.com/documents/short_data_sheet/PN532_C1_SDS.pdf)
 - [User manual](http://www.nxp.com/documents/user_manual/141520.pdf)
