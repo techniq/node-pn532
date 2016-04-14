@@ -105,8 +105,8 @@ Examples are available under the `examples` directory
 If you are using this library on a Raspberry Pi 3, you will likely encounter an [issue](https://github.com/techniq/node-pn532/issues/9) with the device sending or receiving data over UART due to some hardware and configuration changes with regards to the serial port.
 
 TLDR workaround:
-1. Add `core_freq=250` in the `/boot/cmdline.txt`
-2. Use `/dev/ttyS0` instead of `/dev/ttyAMA0`
+  1. Add `core_freq=250` in the `/boot/cmdline.txt`
+  2. Use `/dev/ttyS0` instead of `/dev/ttyAMA0`
 
 For details on why these changes are needed, see [here](http://elinux.org/RPi_Serial_Connection#Preventing_Linux_using_the_serial_port) and [here](https://blog.adafruit.com/2016/03/07/raspberry-pi-3-uart-speed-workaround/)
 
