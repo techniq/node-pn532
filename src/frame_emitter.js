@@ -36,10 +36,15 @@ class FrameEmitter extends EventEmitter {
     }
 
     _processBuffer() {
-        // TODO: filter garbage at front of buffer (anything not 0x00, 0x00, 0xFF at start?)
 
         logger.debug('Processing buffer', util.inspect(this.buffer));
-
+        
+        while (this.buffer.length && !this.buffer.slice(0, 3).equals(new Buffer([0x00, 0x00, 0xFF]))) {
+          // Filter garbage at front of buffer (anything not 0x00, 0x00, 0xFF at start?)
+          logger.debug('Removing garbage', this.buffer[0].toString(16));
+          this.buffer = this.buffer.slice(1);  // Remove first byte and check again
+        }
+        
         if (Frame.isFrame(this.buffer)) {
             logger.debug('Frame found in buffer');
 

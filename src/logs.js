@@ -48,7 +48,7 @@ module.exports = function setupLogging(level) {
         console: {
           level: level,
           colorize: 'true',
-          label: 'hsu'
+          label: 'i2c'
         }
     });
 }

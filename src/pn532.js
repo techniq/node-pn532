@@ -25,7 +25,7 @@ class PN532 extends EventEmitter {
         if (hal.constructor.name === 'SerialPort') {
             var PN532_UART = require('./pn532_uart');
             this.hal = new PN532_UART(hal);
-        } else if (hal.constructor.name === 'i2c') {
+        } else if (hal.constructor.name === 'Bus') {
             var PN532_I2C = require('./pn532_i2c');
             this.hal = new PN532_I2C(hal);
         } else {
@@ -63,7 +63,7 @@ class PN532 extends EventEmitter {
 
             // Wire up listening to wait for response (or error) from PN532
             var onFrame = (frame) => {
-                logger.debug('Response received for sendCommand', util.inspect(frame));
+                logger.debug('Response', util.inspect(frame), 'received for command', commandBuffer[0]);
                 // TODO: If no ACK after 15ms, resend? (page 40 of user guide, UART only)?
 
                 if (frame instanceof AckFrame) {
