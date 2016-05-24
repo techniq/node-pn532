@@ -72,7 +72,7 @@ Tested using NTAG203 tags.  Should support other NTAG and Mifare Ultralight tags
 rfid.on('ready', function() {
     rfid.on('tag', function(tag) {
         rfid.readNdefData().then(function(data) {
-            var records = ndef.decodeMessage(data.toJSON());
+            var records = ndef.decodeMessage(Array.from(data));
             console.log(records);
         });
     });
