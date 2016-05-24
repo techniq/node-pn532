@@ -16,7 +16,7 @@ rfid.on('ready', function() {
         rfid.readNdefData().then(function(data) {
             console.log('Tag data:', data);
 
-            var records = ndef.decodeMessage(data.toJSON());
+            var records = ndef.decodeMessage(Array.from(data));
             console.log(records);
         });
     });
