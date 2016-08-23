@@ -28,6 +28,9 @@ class PN532 extends EventEmitter {
         } else if (hal.constructor.name === 'Bus') {
             var PN532_I2C = require('./pn532_i2c');
             this.hal = new PN532_I2C(hal);
+        } else if (hal.constructor.name === 'Board') {
+            var PN532_I2C_Firmata = require('./pn532_i2c_firmata');
+            this.hal = new PN532_I2C_Firmata(hal);
         } else {
             throw new Error('Unknown hardware type: ', hal.constructor.name);
         }
