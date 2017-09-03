@@ -24,7 +24,7 @@ class PN532_I2C extends EventEmitter {
     }
 
     write(buffer) {
-        this.wire.write(buffer);
+        this.wire.write(buffer, () => {});
     }
 }
 
