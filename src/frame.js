@@ -22,7 +22,7 @@ class Frame {
         throw new Error('Implement in subclass');
     }
 
-    [util.inspect.custom] {
+    [util.inspect.custom]() {
         return util.format('<Frame>');
     }
 
@@ -95,7 +95,7 @@ class DataFrame extends Frame {
         };
     }
 
-    [util.inspect.custom] {
+    [util.inspect.custom]() {
         return util.format('<DataFrame %j>', this.toJSON());
     }
 
@@ -215,7 +215,7 @@ class AckFrame extends Frame {
         ]);
     }
 
-    [util.inspect.custom] {
+    [util.inspect.custom]() {
         return util.format('<AckFrame %j>', this.toBuffer());
     }
 }
@@ -252,7 +252,7 @@ class NackFrame extends Frame {
         ]);
     }
 
-    [util.inspect.custom] {
+    [util.inspect.custom]() {
         return util.format('<NackFrame %j>', this.toBuffer());
     }
 }
