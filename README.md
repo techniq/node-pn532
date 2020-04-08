@@ -21,9 +21,9 @@ and `npm install serialport` or `npm install i2c`
 #### UART (using [node-serialport](https://github.com/voodootikigod/node-serialport))
 ```js
 var pn532 = require('pn532');
-var SerialPort = require('serialport').SerialPort;
+var SerialPort = require('serialport');
 
-var serialPort = new SerialPort('/dev/tty.usbserial-AFWR836M', { baudrate: 115200 });
+var serialPort = new SerialPort('/dev/tty.usbserial-AFWR836M', { baudRate: 115200 });
 var rfid = new pn532.PN532(serialPort);
 ```
 
@@ -40,7 +40,7 @@ var rfid = new pn532.PN532(wire);
 ```js
 rfid.on('ready', function() {
     rfid.scanTag().then(function(tag) {
-        console.log('tag:', tag.uid);
+        if (tag) console.log('tag:', tag.uid);
     });
 });
 ```
@@ -50,7 +50,7 @@ rfid.on('ready', function() {
 rfid.on('ready', function() {
     console.log('Listening for a tag scan...');
     rfid.on('tag', function(tag) {
-        console.log('tag:', tag.uid);
+        if (tag) console.log('tag:', tag.uid);
     });
 });
 ```

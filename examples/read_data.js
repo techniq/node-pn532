@@ -1,7 +1,7 @@
 var pn532 = require('../src/pn532');
-var SerialPort = require('serialport').SerialPort;
+var SerialPort = require('serialport');
 
-var serialPort = new SerialPort('/dev/tty.usbserial-AFWR836M', { baudrate: 115200 });
+var serialPort = new SerialPort('/dev/tty.usbserial-AFWR836M', { baudRate: 115200 });
 var rfid = new pn532.PN532(serialPort);
 var ndef = require('ndef');
 
