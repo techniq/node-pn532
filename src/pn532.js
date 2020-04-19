@@ -38,13 +38,15 @@ class PN532 extends EventEmitter {
         });
 
         this.on('newListener', (event) => {
-            // TODO: Only poll once (for each event type)
-            if (event === 'tag') {
+            // Start polling for tags only the first listener
+            if (this.listeners(event).length < 1 && event === 'tag') {
                 logger.debug('Polling for tag scans...');
                 var scanTag = () => {
                     this.scanTag().then((tag) => {
                         this.emit('tag', tag);
-                        setTimeout(() => scanTag(), this.pollInterval);
+                        if (this.listeners('tag').length > 0) {
+                          setTimeout(() => scanTag(), this.pollInterval);
+                        }
                     });
                 };
                 scanTag();
