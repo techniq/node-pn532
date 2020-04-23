@@ -1,5 +1,6 @@
 'use strict';
 var util = require('util');
+//var Promise = require('bluebird');
 var EventEmitter = require('events').EventEmitter;
 
 var setupLogging = require('./logs');
@@ -371,6 +372,133 @@ class PN532 extends EventEmitter {
             // };
         });
     }
+
+     emulateTag() {
+        logger.info('Emulating tag...');
+        var commAsTarget= 0x8C;
+        var mode = 0x05; // PICC only, Passive Only
+        var sens_res = [0x08, 0x00];
+        var nfcId1t = [0x12, 0x34, 0x56];
+        var sel_res = [0x60];
+        var mifareParams = [].concat(sens_res, nfcId1t, sel_res);
+
+        var felicaParams = [0,0,0,0,0,0,0,0,
+                           0,0,0,0,0,0,0,0,
+                           0,0];
+
+        var nfcId3t = [0,0,0,0,0,0,0,0,0,0];
+        var generalBytesLength = 0;
+        var historicalBytesLength =  0;
+        var commandBuffer = [].concat(
+            commAsTarget,
+            mode,
+            mifareParams,
+            felicaParams,
+            nfcId3t,
+            generalBytesLength,
+            historicalBytesLength
+        );
+        console.log('commandBuffer : '+ commandBuffer);
+        return this.sendCommand(commandBuffer)
+        .then((frame) => {
+            var body = frame.getDataBody();
+            logger.debug('body', util.inspect(body));
+            var mode = body[0];
+            console.log('mode', mode);
+            logger.debug('mode', mode);
+            // var initiatorCommand = ...
+            // var numberOfTags = body[0];
+            // if (numberOfTags === 1) {
+            //     var tagNumber = body[1];
+            //     var uidLength = body[5];
+            //
+            //     var uid = body.slice(6, 6 + uidLength)
+            //     .toString('hex')
+            //     .match(/.{1,2}/g)
+            //     .join(':');
+            //
+            //     return {
+            //         ATQA: body.slice(2, 4), // SENS_RES
+            //         SAK: body[4],           // SEL_RES
+            //         uid: uid
+            //     };
+            // }
+        });
+    }
+    
+    emulateGetData() {
+        logger.info('Emulate get data...');
+
+        return this.sendCommand([c.TG_GET_DATA])//0x86
+        .then((frame) => {
+            var body = frame.getDataBody();
+            logger.debug('Frame data from emulate get data read:', util.inspect(body));
+            var status = body[0];
+            if (status === 0x13) {
+                logger.warn('The data format does not match to the specification.');
+            }
+            // var dataIn = body.slice(1, body.length - 1); // skip status byte and last byte (not part of memory)
+            // 00 00 a4 04 00 07 d2 76 00 00 85 01 01 00 26
+            var cla = body[1]
+            var instruction = body[2];
+            var parameter1 = body[3];
+            var parameter2 = body[4];
+            var commandLength = body[5];
+            var data = body.slice(6, commandLength);
+            logger.debug('data', util.inspect(data));
+
+            logger.debug('instruction', instruction);
+            logger.debug('parameter1', parameter1);
+            logger.debug('parameter2', parameter2);
+            logger.debug('commandLength', commandLength);
+            logger.debug('data', util.inspect(data));
+            console.log('Final data read : '+data);
+            return data;
+        });
+    }
+/*
+    emulateSetData(data) {
+        logger.info('Writing data...');
+        // // Prepend data with NDEF type and length (TLV) and append terminator TLV
+        // var block = [].concat([
+        //     c.TAG_MEM_NDEF_TLV,
+        //     data.length
+        //     ],  data, [
+        //     c.TAG_MEM_TERMINATOR_TLV
+        //     ]);
+        //
+        //     logger.debug('block:', util.inspect(new Buffer(block)));
+        //
+        //     var PAGE_SIZE = 4;
+        //     var totalBlocks = Math.ceil(block.length / PAGE_SIZE);
+        //
+        //     // Sequentially write each additional 4-byte pages of data, chaining promises
+        //     var self = this;
+        //     var allPromises = (function writeBlock(blockNum) {
+        //         if (blockNum < totalBlocks) {
+        //             var blockAddress = 0x04 + blockNum;
+        //             var pageData = block.splice(0, PAGE_SIZE);
+        //
+        //             if (pageData.length < PAGE_SIZE) {
+        //                 pageData.length = PAGE_SIZE; // Setting length will make sure NULL TLV (0x00) are written at the end of the page
+        //             }
+        //
+        //             logger.debug('Writing block:', blockNum, 'at blockAddress:', blockAddress);
+        //             logger.debug('pageData:', util.inspect(new Buffer(pageData)));
+        //             return self.writeBlock(pageData, {blockAddress: blockAddress})
+        //             .then(function(block) {
+        //                 blockNum++;
+        //                 // ndefData = Buffer.concat([ndefData, block]);
+        //                 return writeBlock(blockNum);
+        //             });
+        //         }
+        //     })(0);
+        //
+        //     // return allDataPromise.then(() => ndefData.slice(0, ndefLength));
+        //     return allPromises;
+        // }
+    }
+    */
 }
 
 exports.PN532 = PN532;
