@@ -23,7 +23,7 @@ and `npm install serialport` or `npm install i2c`
 var pn532 = require('pn532');
 var SerialPort = require('serialport');
 
-var serialPort = new SerialPort('/dev/tty.usbserial-AFWR836M', { baudRate: 115200 });
+var serialPort = new SerialPort({path:'/dev/tty.usbserial-AFWR836M',  baudRate: 115200 });
 var rfid = new pn532.PN532(serialPort);
 ```
 
